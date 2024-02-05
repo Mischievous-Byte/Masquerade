@@ -1,0 +1,10 @@
+{
+    "name": "com.mischievous-byte.masquerade",
+    "displayName": "Masquerade",
+    "version": "0.0.1",
+    "description": "Library for retargeting humanoid skeletal structures",
+    "author": {
+      "name": "Laurens Kruis"
+    },
+    "type": "library"
+}
