@@ -6,7 +6,7 @@ using UnityEngine;
 namespace MischievousByte.Masquerade.Utility
 {
     /// <summary>
-    /// Attribute used to signal the system during reflection phase
+    /// Attribute used to signal <see cref="MischievousByte.Masquerade.Utility.RemapperRegistry"></see> during reflection phase
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class RemapperAttribute : Attribute

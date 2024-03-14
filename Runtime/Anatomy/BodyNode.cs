@@ -20,6 +20,7 @@ namespace MischievousByte.Masquerade.Anatomy
         [BodyNodeProperties(parent: T7)] C7,
         [BodyNodeProperties(parent: C7)] Head,
         [BodyNodeProperties(parent: Head)] Eyes,
+        [BodyNodeProperties(parent: Head)] HeadTop,
         [BodyNodeProperties(parent: T7)] LeftClavicle,
         [BodyNodeProperties(parent: LeftClavicle)] LeftScapula,
         [BodyNodeProperties(parent: LeftScapula)] LeftUpperArm,

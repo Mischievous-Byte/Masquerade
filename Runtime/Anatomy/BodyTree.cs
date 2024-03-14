@@ -15,6 +15,7 @@ namespace MischievousByte.Masquerade.Anatomy
         [SerializeField] private T c7;
         [SerializeField] private T head;
         [SerializeField] private T eyes;
+        [SerializeField] private T headTop;
 
         [Header("Left Arm")]
         [SerializeField] private T leftClavicle;

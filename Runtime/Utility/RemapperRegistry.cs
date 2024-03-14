@@ -24,11 +24,11 @@ namespace MischievousByte.Masquerade.Utility
         {
             float a = 10f;
             BodyTree<Matrix4x4> input = new BodyTree<Matrix4x4>();
-            BodyTree<Matrix4x4> output;
+            BodyTree<Matrix4x4> output = new BodyTree<Matrix4x4>();
             
             FindFlaggedMethods();
 
-            Find<float>()(in input, in a, out output, in a);
+            //Find<float>()(in input, in a, out output, in a);
         }
 
 
@@ -66,7 +66,7 @@ namespace MischievousByte.Masquerade.Utility
                 if (!parameters[0].IsIn || parameters[0].ParameterType != typeof(BodyTree<Matrix4x4>).MakeByRefType())
                     return false;
 
-                if (!parameters[2].IsOut || parameters[2].ParameterType != typeof(BodyTree<Matrix4x4>).MakeByRefType())
+                if (!parameters[2].ParameterType.IsByRef || parameters[2].ParameterType != typeof(BodyTree<Matrix4x4>).MakeByRefType())
                     return false;
 
                 if (!parameters[1].IsIn || !parameters[3].IsIn)
@@ -86,7 +86,7 @@ namespace MischievousByte.Masquerade.Utility
                 if (!parameters[0].IsIn || parameters[0].ParameterType != typeof(BodyTree<Matrix4x4>))
                     return false;
 
-                if (!parameters[2].IsOut || parameters[2].ParameterType != typeof(BodyTree<Matrix4x4>))
+                if (!parameters[2].ParameterType.IsByRef || parameters[2].ParameterType != typeof(BodyTree<Matrix4x4>))
                     return false;
 
                 if (!parameters[1].IsIn || !parameters[3].IsIn)
