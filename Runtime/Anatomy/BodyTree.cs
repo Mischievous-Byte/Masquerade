@@ -124,7 +124,7 @@ namespace MischievousByte.Masquerade.Anatomy
 
         public IEnumerator<KeyValuePair<BodyNode, T>> GetEnumerator()
         {
-            foreach (var node in BodyNodeUtility.All)
+            foreach (var node in BodyNode.All.Enumerate())
                 yield return new KeyValuePair<BodyNode, T>(node, this[node]);
         }
 

@@ -11,37 +11,43 @@ namespace MischievousByte.Masquerade.Anatomy
     /// <summary>
     /// An enum containing all possible nodes for representing a hunanoid skeletal structure. Similar to <see cref="UnityEngine.HumanBodyBones">HumanBodyBones</see>
     /// </summary>
-    public enum BodyNode
+    [Flags]
+    public enum BodyNode : uint
     {
-        Sacrum,
-        [BodyNodeProperties(parent: Sacrum)] L3,
-        [BodyNodeProperties(parent: L3)] T12,
-        [BodyNodeProperties(parent: T12)] T7,
-        [BodyNodeProperties(parent: T7)] C7,
-        [BodyNodeProperties(parent: C7)] Head,
-        [BodyNodeProperties(parent: Head)] Eyes,
-        [BodyNodeProperties(parent: Head)] HeadTop,
-        [BodyNodeProperties(parent: T7)] LeftClavicle,
-        [BodyNodeProperties(parent: LeftClavicle)] LeftScapula,
-        [BodyNodeProperties(parent: LeftScapula)] LeftUpperArm,
-        [BodyNodeProperties(parent: LeftUpperArm)] LeftForearm,
-        [BodyNodeProperties(parent: LeftForearm)] LeftWrist,
-        [BodyNodeProperties(parent: LeftWrist)] LeftHand,
-        [BodyNodeProperties(parent: T7)] RightClavicle,
-        [BodyNodeProperties(parent: RightClavicle)] RightScapula,
-        [BodyNodeProperties(parent: RightScapula)] RightUpperArm,
-        [BodyNodeProperties(parent: RightUpperArm)] RightForearm,
-        [BodyNodeProperties(parent: RightForearm)] RightWrist,
-        [BodyNodeProperties(parent: RightWrist)] RightHand,
-        [BodyNodeProperties(parent: Sacrum)] LeftUpperLeg,
-        [BodyNodeProperties(parent: LeftUpperLeg)] LeftLowerLeg,
-        [BodyNodeProperties(parent: LeftLowerLeg)] LeftFoot,
-        [BodyNodeProperties(parent: LeftFoot)] LeftToes,
-        [BodyNodeProperties(parent: Sacrum)] RightUpperLeg,
-        [BodyNodeProperties(parent: RightUpperLeg)] RightLowerLeg,
-        [BodyNodeProperties(parent: RightLowerLeg)] RightFoot,
-        [BodyNodeProperties(parent: RightFoot)] RightToes,
-        Invalid
+        None = 0,
+        /// <summary>
+        /// Exluded BodyNode.Invalid
+        /// </summary>
+        All = uint.MaxValue >> (32 - 27),
+        Sacrum = 1,
+        [BodyNodeProperties(parent: Sacrum)] L3 = 1 << 1,
+        [BodyNodeProperties(parent: L3)] T12 = 1 << 2,
+        [BodyNodeProperties(parent: T12)] T7 = 1 << 3 ,
+        [BodyNodeProperties(parent: T7)] C7 = 1 << 4,
+        [BodyNodeProperties(parent: C7)] Head = 1 << 5,
+        [BodyNodeProperties(parent: Head)] Eyes = 1 << 6,
+        [BodyNodeProperties(parent: Head)] HeadTop = 1 << 7,
+        [BodyNodeProperties(parent: T7)] LeftClavicle = 1 << 8,
+        [BodyNodeProperties(parent: LeftClavicle)] LeftScapula = 1 << 9,
+        [BodyNodeProperties(parent: LeftScapula)] LeftUpperArm = 1 << 10,
+        [BodyNodeProperties(parent: LeftUpperArm)] LeftForearm = 1 << 11,
+        [BodyNodeProperties(parent: LeftForearm)] LeftWrist = 1 << 12,
+        [BodyNodeProperties(parent: LeftWrist)] LeftHand = 1 << 13,
+        [BodyNodeProperties(parent: T7)] RightClavicle = 1 << 14,
+        [BodyNodeProperties(parent: RightClavicle)] RightScapula = 1 << 15,
+        [BodyNodeProperties(parent: RightScapula)] RightUpperArm = 1 << 16,
+        [BodyNodeProperties(parent: RightUpperArm)] RightForearm = 1 << 17,
+        [BodyNodeProperties(parent: RightForearm)] RightWrist = 1 << 18,
+        [BodyNodeProperties(parent: RightWrist)] RightHand = 1 << 19,
+        [BodyNodeProperties(parent: Sacrum)] LeftUpperLeg = 1 << 20,
+        [BodyNodeProperties(parent: LeftUpperLeg)] LeftLowerLeg = 1 << 21,
+        [BodyNodeProperties(parent: LeftLowerLeg)] LeftFoot = 1 << 22,
+        [BodyNodeProperties(parent: LeftFoot)] LeftToes = 1 << 23,
+        [BodyNodeProperties(parent: Sacrum)] RightUpperLeg = 1 << 24,
+        [BodyNodeProperties(parent: RightUpperLeg)] RightLowerLeg = 1 << 25,
+        [BodyNodeProperties(parent: RightLowerLeg)] RightFoot = 1 << 26,
+        [BodyNodeProperties(parent: RightFoot)] RightToes = 1 << 27,
+        Invalid = 1 << 28
     }
 
 
@@ -66,19 +72,19 @@ namespace MischievousByte.Masquerade.Anatomy
             public BodyNode parent;
         }
 
-        public static readonly IReadOnlyCollection<BodyNode> All = new ReadOnlyCollection<BodyNode>(Enum.GetValues(typeof(BodyNode)).Cast<BodyNode>().Where(x => x != BodyNode.Invalid).ToArray());
-
         private static NodeProperties[] properties = new NodeProperties[(int)BodyNode.Invalid];
 
+        
         static BodyNodeUtility()
         {
-            Enum.GetValues(typeof(BodyNode)).Cast<BodyNode>().ToList().ForEach(n => properties[(int)n] = FetchProperties(n));
+            BodyNode.All.Enumerate().ToList().ForEach(n => properties[(int)n] = FetchProperties(n));
 
             //Safety to make sure that the sacrum is the only root node
-            foreach (var node in All.Where(n => n != BodyNode.Sacrum))
+            foreach (var node in BodyNode.All.Enumerate().Where(n => n != BodyNode.Sacrum))
                 if (node.Previous() == BodyNode.Invalid)
                     throw new FormatException("BodyNode tree has multiple roots");
         }
+
 
         private static NodeProperties FetchProperties(BodyNode node)
         {
@@ -97,6 +103,15 @@ namespace MischievousByte.Masquerade.Anatomy
             return props;
         }
 
+        public static IEnumerable<BodyNode> Enumerate(this BodyNode flags)
+        {
+            for(int i = 0; i < 28; i ++)
+            {
+                BodyNode node = (BodyNode) (1u << i);
+                if ((flags & node) != 0)
+                    yield return node;
+            }
+        }
 
         public static BodyNode Previous(this BodyNode node)
         {

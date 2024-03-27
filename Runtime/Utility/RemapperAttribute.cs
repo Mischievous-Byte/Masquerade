@@ -1,3 +1,4 @@
+using MischievousByte.Masquerade.Anatomy;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,6 +12,11 @@ namespace MischievousByte.Masquerade.Utility
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class RemapperAttribute : Attribute
     {
+        public readonly BodyNode Target;
 
+        public RemapperAttribute(BodyNode target)
+        {
+            Target = target;
+        }
     }
 }

@@ -8,9 +8,37 @@ namespace MischievousByte.Masquerade.Utility
 {
     public static class BuiltInRemapper
     {
+        public static class TMP
+        {
+            [Remapper(BodyNode.All)]
+            public static void Simple(
+                in BodyTree<Matrix4x4> source,
+                ref BodyTree<Matrix4x4> destination)
+            {
+                Debug.Log("Simple");
+            }
+
+            [Remapper(CommonNodeGroupings.LeftArm)]
+            public static void Collider(
+                in BodyTree<Matrix4x4> source,
+                ref BodyTree<Matrix4x4> destination,
+                in Collider collider)
+            {
+                Debug.Log("Collider");
+            }
+
+            [Remapper(CommonNodeGroupings.RightArm)]
+            public static void BoxCollider(
+                in BodyTree<Matrix4x4> source,
+                ref BodyTree<Matrix4x4> destination,
+                in BoxCollider collider)
+            {
+                Debug.Log("Box Collider");
+            }
+        }
         private static readonly BodyNode[] spine = new BodyNode[] { BodyNode.Sacrum, BodyNode.L3, BodyNode.T12, BodyNode.T7, BodyNode.C7, BodyNode.Head };
 
-        [Remapper]
+        //[Remapper(BodyNode.All)]
         public static void Remap(
             in BodyTree<Matrix4x4> source,
             in float sourceHeight,
