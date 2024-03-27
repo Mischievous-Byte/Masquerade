@@ -15,6 +15,7 @@ namespace MischievousByte.Masquerade.Anatomy
         [SerializeField] private T c7;
         [SerializeField] private T head;
         [SerializeField] private T eyes;
+        [SerializeField] private T headTop;
 
         [Header("Left Arm")]
         [SerializeField] private T leftClavicle;
@@ -123,7 +124,7 @@ namespace MischievousByte.Masquerade.Anatomy
 
         public IEnumerator<KeyValuePair<BodyNode, T>> GetEnumerator()
         {
-            foreach (var node in BodyNodeUtility.All)
+            foreach (var node in BodyNode.All.Enumerate())
                 yield return new KeyValuePair<BodyNode, T>(node, this[node]);
         }
 

@@ -3,14 +3,32 @@ using MischievousByte.Masquerade.Anatomy;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.Video;
+using static PlasticGui.WorkspaceWindow.Diff.GetRestorePathData;
 
 namespace MischievousByte.Masquerade.Utility
 {
     public static class RemapperRegistry
     {
+        public delegate void RemapDelegate(in BodyTree<Matrix4x4> source, ref BodyTree<Matrix4x4> destination);
+        public delegate void RemapDelegate<TData>(in BodyTree<Matrix4x4> source, ref BodyTree<Matrix4x4> destination, in TData data);
+
+
+        private struct Entry
+        {
+            public Delegate action;
+            public BodyNode flags;
+        }
+
+        public static bool FindAlternativesByInheritance = true;
+
+        private static List<Entry> entries = new();
+        
 
 #if UNITY_EDITOR
         [UnityEditor.InitializeOnLoadMethod]
@@ -20,59 +38,49 @@ namespace MischievousByte.Masquerade.Utility
         private static void OnLoad() { } //Empty method to call static constructor
 
         
+
         static RemapperRegistry()
         {
-            float a = 10f;
-            BodyTree<Matrix4x4> input = new BodyTree<Matrix4x4>();
-            BodyTree<Matrix4x4> output;
-            
             FindFlaggedMethods();
-
-            Find<float>()(in input, in a, out output, in a);
         }
-
-
 
         private static void FindFlaggedMethods()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 foreach (var type in assembly.GetTypes())
                     foreach (var method in type.GetMethods())
-                        if (method.GetCustomAttribute<RemapperAttribute>() != null)
+                    {
+                        RemapperAttribute attribute = method.GetCustomAttribute<RemapperAttribute>();
+                        if (attribute != null)
                             try
                             {
-                                ProcessRemappingMethodInfo(method);
-                            } catch(Exception ex)
+                                ProcessRemappingMethodInfo(method, attribute.Target);
+                            }
+                            catch (Exception ex)
                             {
                                 Debug.LogException(ex);
                             }
+                    }
+                        
         }
 
 
-        private static void ProcessRemappingMethodInfo(MethodInfo info)
+        private static void ProcessRemappingMethodInfo(MethodInfo info, BodyNode target)
         {
             if (!info.IsStatic)
                 throw new ArgumentException();
 
             var parameters = info.GetParameters();
 
-            
-
             bool IsSimple()
             {
-                if (parameters.Length != 4)
+                if (parameters.Length != 2)
                     return false;
 
                 if (!parameters[0].IsIn || parameters[0].ParameterType != typeof(BodyTree<Matrix4x4>).MakeByRefType())
                     return false;
 
-                if (!parameters[2].IsOut || parameters[2].ParameterType != typeof(BodyTree<Matrix4x4>).MakeByRefType())
-                    return false;
-
-                if (!parameters[1].IsIn || !parameters[3].IsIn)
-                    return false;
-
-                if (parameters[1].GetType() != parameters[3].GetType())
+                if (!parameters[1].ParameterType.IsByRef || parameters[1].ParameterType != typeof(BodyTree<Matrix4x4>).MakeByRefType())
                     return false;
 
                 return true;
@@ -80,22 +88,16 @@ namespace MischievousByte.Masquerade.Utility
 
             bool IsComplex()
             {
-                if (parameters.Length != 5)
+                if (parameters.Length != 3)
                     return false;
 
-                if (!parameters[0].IsIn || parameters[0].ParameterType != typeof(BodyTree<Matrix4x4>))
+                if (!parameters[0].IsIn || parameters[0].ParameterType != typeof(BodyTree<Matrix4x4>).MakeByRefType())
                     return false;
 
-                if (!parameters[2].IsOut || parameters[2].ParameterType != typeof(BodyTree<Matrix4x4>))
+                if (!parameters[1].ParameterType.IsByRef || parameters[1].ParameterType != typeof(BodyTree<Matrix4x4>).MakeByRefType())
                     return false;
 
-                if (!parameters[1].IsIn || !parameters[3].IsIn)
-                    return false;
-
-                if (parameters[1].GetType() != parameters[3].GetType())
-                    return false;
-
-                if (!parameters[4].IsIn)
+                if (!parameters[2].IsIn)
                     return false;
 
                 return true;
@@ -108,93 +110,72 @@ namespace MischievousByte.Masquerade.Utility
                 return u == null ? t : u;
             }
 
+            Delegate del;
             if (IsSimple())
-                remappers.Add(Delegate.CreateDelegate(
-                    typeof(RemapDelegate<>).MakeGenericType(GetBase(parameters[1].ParameterType)),
-                    info));
+                del = Delegate.CreateDelegate(
+                    typeof(RemapDelegate),
+                    info);
             else if (IsComplex())
-                remappers.Add(Delegate.CreateDelegate(
+                del = Delegate.CreateDelegate(
                     typeof(RemapDelegate<>).MakeGenericType(
-                        GetBase(parameters[1].ParameterType), 
-                        GetBase(parameters[4].ParameterType)),
-                    info));
+                        GetBase(parameters[2].ParameterType)),
+                    info);
             else
                 throw new ArgumentException();
-        }
 
-
-        public delegate void RemapDelegate<TUnique>(in BodyTree<Matrix4x4> source, in TUnique sourceData, out BodyTree<Matrix4x4> destination, in TUnique destinationData);
-        public delegate void RemapDelegate<TUnique, TSettings>(in BodyTree<Matrix4x4> source, in TUnique sourceData, out BodyTree<Matrix4x4> destination, in TUnique destinationData, in TSettings settings);
-
-        private static List<Delegate> remappers = new List<Delegate>();
-
-        public static void Register<TUnique>(RemapDelegate<TUnique> method)
-        {
-            if (method == null)
-                throw new ArgumentNullException();
-
-            if (remappers.Contains(method))
-                return;
-
-            remappers.Add(method);
-        }
-
-        public static void Register<TUnique, TSettings>(RemapDelegate<TUnique, TSettings> method)
-        {
-            if (method == null)
-                throw new ArgumentNullException();
-
-            if (remappers.Contains(method))
-                return;
-
-            remappers.Add(method);
-        }
-
-
-        public static RemapDelegate<TUnique> Find<TUnique>()
-        {
-            RemapDelegate<TUnique> bestMatch = null;
-
-            foreach(var r in remappers)
+            entries.Add(new Entry()
             {
-                //Find first options available
-                if (r is RemapDelegate<TUnique> x && bestMatch == null)
-                    bestMatch = x;
-
-                //Keep looking for an exact match
-                Type[] generics = r.GetType().GetGenericArguments();
-
-                if (generics.Length != 1)
-                    continue;
-
-                if (r.GetType().GetGenericArguments()[0] == typeof(TUnique))
-                    return r as RemapDelegate<TUnique>;
-            }
-            
-            return bestMatch;
+                action = del,
+                flags = target
+            });
         }
 
-        public static RemapDelegate<TUnique, TSettings> Find<TUnique, TSettings>()
+        
+
+        public static RemapDelegate Find(BodyNode target) => 
+            entries.Where(e => e.flags == target && e.action is RemapDelegate).First().action as RemapDelegate;
+
+        public static RemapDelegate<TData> Find<TData>(BodyNode target)
         {
-            RemapDelegate<TUnique, TSettings> bestMatch = null;
-
-            foreach (var r in remappers)
+            var r = entries
+                .Where(e => e.flags == target && !(e.action is RemapDelegate))
+                .Where(e => e.action.GetType().GetGenericArguments()[0].IsAssignableFrom(typeof(TData)))
+                .Select(entry =>
             {
-                //Find first options available
-                if (r is RemapDelegate<TUnique, TSettings> x && bestMatch == null)
-                    bestMatch = x;
+                Type child = typeof(TData);
+                Type parent = entry.action.GetType().GetGenericArguments()[0];
 
-                //Keep looking for an exact match
-                Type[] generics = r.GetType().GetGenericArguments();
+                int distance = 0;
+                while (true)
+                {
+                    if (child == parent)
+                        break;
 
-                if (generics.Length != 2)
-                    continue;
 
-                if (generics[0] == typeof(TUnique) && generics[2] == typeof(TSettings))
-                    return r as RemapDelegate<TUnique, TSettings>;
-            }
+                    child = child.BaseType;
+                    distance++;
+                }
 
-            return bestMatch;
+                return (entry, distance);
+            }).OrderBy(p => p.distance).FirstOrDefault();
+
+
+            if (r.distance == 0)
+                return r.entry.action as RemapDelegate<TData>;
+
+            if (!FindAlternativesByInheritance)
+                return null;
+
+            RemapDelegate<TData> wrapper = (in BodyTree<Matrix4x4> source, ref BodyTree<Matrix4x4> destination, in TData data) => 
+            {
+                object[] p = { source, destination, data };
+                r.entry.action.DynamicInvoke(p);
+
+                destination = (BodyTree<Matrix4x4>) p[1];
+            };
+
+
+            return wrapper;
         }
     }
 }
