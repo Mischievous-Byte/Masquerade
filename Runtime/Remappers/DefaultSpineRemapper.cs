@@ -9,7 +9,7 @@ namespace MischievousByte.Masquerade.Remappers
 {
     public static class DefaultSpineRemapper
     {
-        [Remapper(CommonNodeGroupings.Spine)]
+        [Remapper(CommonGroupings.Spine)]
         public static void Remap(
             in BodyTree<Matrix4x4> source, 
             in float sourceHeight,
@@ -22,7 +22,7 @@ namespace MischievousByte.Masquerade.Remappers
 
         private static void Rotate(in BodyTree<Matrix4x4> source, ref BodyTree<Matrix4x4> destination)
         {
-            foreach(BodyNode node in CommonNodeGroupings.Spine.Enumerate())
+            foreach(BodyNode node in CommonGroupings.Spine.Enumerate())
                 destination[node] = Matrix4x4.TRS(destination[node].GetPosition(), source[node].rotation, Vector3.one);
         }
 

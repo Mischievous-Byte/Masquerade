@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MischievousByte.Masquerade.Utility
 {
-    public static class CommonNodeGroupings
+    public static class CommonGroupings
     {
         public const BodyNode Spine = BodyNode.Sacrum | BodyNode.L3 | BodyNode.T12 | BodyNode.T7 | BodyNode.C7 | BodyNode.Head;
         public const BodyNode LeftArm = BodyNode.LeftClavicle | BodyNode.LeftScapula | BodyNode.LeftUpperArm | BodyNode.LeftForearm | BodyNode.LeftWrist;
