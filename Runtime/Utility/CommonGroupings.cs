@@ -1,4 +1,3 @@
-using MischievousByte.Masquerade.Anatomy;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

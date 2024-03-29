@@ -1,10 +1,9 @@
-using MischievousByte.Masquerade.Anatomy;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade.Utility
+namespace MischievousByte.Masquerade
 {
     /// <summary>
     /// Attribute used to signal <see cref="MischievousByte.Masquerade.Utility.RemapperRegistry"></see> during reflection phase

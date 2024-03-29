@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade.Anatomy
+namespace MischievousByte.Masquerade
 {
     public static class BodyTreeUtility
     {

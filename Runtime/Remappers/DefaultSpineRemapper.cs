@@ -1,4 +1,3 @@
-using MischievousByte.Masquerade.Anatomy;
 using MischievousByte.Masquerade.Utility;
 using System;
 using System.Collections;

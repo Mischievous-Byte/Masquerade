@@ -1,4 +1,3 @@
-using MischievousByte.Masquerade.Anatomy;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,33 +6,10 @@ using System.Reflection;
 using System.Security.Cryptography;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade.Utility
+namespace MischievousByte.Masquerade
 {
     public static class RemapperRegistry
     {
-        public delegate void RemapDelegate(
-            in BodyTree<Matrix4x4> source, 
-            ref BodyTree<Matrix4x4> destination);
-
-        public delegate void RemapDelegate<TSettings>(
-            in BodyTree<Matrix4x4> source, 
-            ref BodyTree<Matrix4x4> destination, 
-            in TSettings data);
-
-        public delegate void RemapDelegate<TUniqueS, TUniqueD>(
-            in BodyTree<Matrix4x4> source,
-            in TUniqueS sourceData,
-            ref BodyTree<Matrix4x4> destination,
-            in TUniqueD destinationData);
-
-        public delegate void RemapDelegate<TUniqueS, TUniqueD, TSettings>(
-            in BodyTree<Matrix4x4> source,
-            in TUniqueS sourceData,
-            ref BodyTree<Matrix4x4> destination,
-            in TUniqueD destinationData,
-            in TSettings data);
-
-
         private static class MethodInfoLoader
         {
             public static bool TryCreateDelegate(MethodInfo info, out Delegate del)

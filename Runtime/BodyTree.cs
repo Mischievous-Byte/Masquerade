@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade.Anatomy
+namespace MischievousByte.Masquerade
 {
     [System.Serializable]
     public struct BodyTree<T> : IReadOnlyCollection<KeyValuePair<BodyNode, T>>
