@@ -21,13 +21,6 @@ namespace MischievousByte.Masquerade
                 return false;
             }
 
-            private static Type GetBase(Type t)
-            {
-                var u = t.GetElementType();
-
-                return u == null ? t : u;
-            }
-
             private static bool HandleSimple(MethodInfo info, out Delegate del)
             {
                 del = null;
@@ -68,7 +61,7 @@ namespace MischievousByte.Masquerade
 
                 del = Delegate.CreateDelegate(
                     typeof(RemapDelegate<>).MakeGenericType(
-                        GetBase(parameters[2].ParameterType)),
+                        parameters[2].ParameterType.GetElementType() ?? parameters[2].ParameterType),
                     info);
 
                 return true;
@@ -93,8 +86,8 @@ namespace MischievousByte.Masquerade
 
                 del = Delegate.CreateDelegate(
                     typeof(RemapDelegate<,>).MakeGenericType(
-                        GetBase(parameters[1].ParameterType),
-                        GetBase(parameters[3].ParameterType)),
+                        parameters[1].ParameterType.GetElementType() ?? parameters[1].ParameterType,
+                        parameters[3].ParameterType.GetElementType() ?? parameters[3].ParameterType),
                     info);
 
                 return true;
@@ -119,9 +112,9 @@ namespace MischievousByte.Masquerade
 
                 del = Delegate.CreateDelegate(
                     typeof(RemapDelegate<,,>).MakeGenericType(
-                        GetBase(parameters[1].ParameterType),
-                        GetBase(parameters[3].ParameterType),
-                        GetBase(parameters[4].ParameterType)),
+                        parameters[1].ParameterType.GetElementType() ?? parameters[1].ParameterType,
+                        parameters[3].ParameterType.GetElementType() ?? parameters[3].ParameterType,
+                        parameters[4].ParameterType.GetElementType() ?? parameters[4].ParameterType),
                     info);
 
                 return true;
