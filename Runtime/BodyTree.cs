@@ -58,6 +58,7 @@ namespace MischievousByte.Masquerade
                     case BodyNode.C7: return c7;
                     case BodyNode.Head: return head;
                     case BodyNode.Eyes: return eyes;
+                    case BodyNode.HeadTop: return headTop;
                     case BodyNode.LeftClavicle: return leftClavicle;
                     case BodyNode.LeftScapula: return leftScapula;
                     case BodyNode.LeftUpperArm: return leftUpperArm;
@@ -93,6 +94,7 @@ namespace MischievousByte.Masquerade
                     case BodyNode.C7: c7 = value; return;
                     case BodyNode.Head: head = value; return;
                     case BodyNode.Eyes: eyes = value; return;
+                    case BodyNode.HeadTop: headTop = value; return;
                     case BodyNode.LeftClavicle: leftClavicle = value; return;
                     case BodyNode.LeftScapula: leftScapula = value; return;
                     case BodyNode.LeftUpperArm: leftUpperArm = value; return;
