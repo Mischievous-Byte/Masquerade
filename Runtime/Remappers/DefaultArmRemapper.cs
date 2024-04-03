@@ -10,7 +10,7 @@ namespace MischievousByte.Masquerade.Remappers
     /// </summary>
     public static class DefaultArmRemapper
     {
-        [Remapper(CommonGroupings.LeftArm)]
+        [Remapper(CommonNodeGroupings.LeftArm)]
         public static void RemapLeftArm(
             in BodyTree<Matrix4x4> source,
             ref BodyTree<Matrix4x4> destination)
@@ -18,7 +18,7 @@ namespace MischievousByte.Masquerade.Remappers
             RemapArm(source, ref destination, LeftRight.Left);
         }
 
-        [Remapper(CommonGroupings.LeftArm)]
+        [Remapper(CommonNodeGroupings.LeftArm)]
         public static void RemapRightArm(
             in BodyTree<Matrix4x4> source,
             ref BodyTree<Matrix4x4> destination)
@@ -94,8 +94,7 @@ namespace MischievousByte.Masquerade.Remappers
         private static Bounds GetReachBounds(in BodyTree<Matrix4x4> tree, LeftRight side)
         {
             BodyNode clavicle = side == LeftRight.Left ? BodyNode.LeftClavicle : BodyNode.RightClavicle;
-            BodyNode scapula = clavicle.Next();
-            BodyNode upperArm = scapula.Next();
+            BodyNode upperArm = clavicle.Next();
             BodyNode forearm = upperArm.Next();
             BodyNode wrist = forearm.Next();
 
@@ -105,7 +104,7 @@ namespace MischievousByte.Masquerade.Remappers
                 tree[wrist].GetPosition().magnitude
                 + tree[forearm].GetPosition().magnitude;
 
-            Vector3 anchor = (tree[clavicle] * tree[scapula] * tree[upperArm]).GetPosition();
+            Vector3 anchor = (tree[clavicle] * tree[upperArm]).GetPosition();
 
             Vector3 forward = anchor + Vector3.forward * dynamicLength;
             Vector3 back = anchor + Vector3.back * dynamicLength;
@@ -127,9 +126,9 @@ namespace MischievousByte.Masquerade.Remappers
         {
 
             BodyNode clavicleNode = side == LeftRight.Left ? BodyNode.LeftClavicle : BodyNode.RightClavicle;
-            BodyNode upperArmNode = clavicleNode + 1;
-            BodyNode forearmNode = upperArmNode + 1;
-            BodyNode wristNode = forearmNode + 1;
+            BodyNode upperArmNode = clavicleNode.Next();
+            BodyNode forearmNode = upperArmNode.Next();
+            BodyNode wristNode = forearmNode.Next();
 
 
             source.ChangeSpace(Space.World, out var worldSource);
@@ -169,8 +168,7 @@ namespace MischievousByte.Masquerade.Remappers
         private static void SolveArm(ref BodyTree<Matrix4x4> tree, Pose target, Vector3 hint, LeftRight side)
         {
             BodyNode clavicle = side == LeftRight.Left ? BodyNode.LeftClavicle : BodyNode.RightClavicle;
-            BodyNode scapula = clavicle.Next();
-            BodyNode upperArm = scapula.Next();
+            BodyNode upperArm = clavicle.Next();
             BodyNode forearm = upperArm.Next();
             BodyNode wrist = forearm.Next();
 

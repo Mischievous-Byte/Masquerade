@@ -19,7 +19,7 @@ namespace MischievousByte.Masquerade
 
         [Header("Left Arm")]
         [SerializeField] private T leftClavicle;
-        [SerializeField] private T leftScapula;
+        //[SerializeField] private T leftScapula;
         [SerializeField] private T leftUpperArm;
         [SerializeField] private T leftForearm;
         [SerializeField] private T leftWrist;
@@ -27,7 +27,7 @@ namespace MischievousByte.Masquerade
 
         [Header("Right Arm")]
         [SerializeField] private T rightClavicle;
-        [SerializeField] private T rightScapula;
+        //[SerializeField] private T rightScapula;
         [SerializeField] private T rightUpperArm;
         [SerializeField] private T rightForearm;
         [SerializeField] private T rightWrist;
@@ -60,13 +60,13 @@ namespace MischievousByte.Masquerade
                     case BodyNode.Eyes: return eyes;
                     case BodyNode.HeadTop: return headTop;
                     case BodyNode.LeftClavicle: return leftClavicle;
-                    case BodyNode.LeftScapula: return leftScapula;
+                    //case BodyNode.LeftScapula: return leftScapula;
                     case BodyNode.LeftUpperArm: return leftUpperArm;
                     case BodyNode.LeftForearm: return leftForearm;
                     case BodyNode.LeftWrist: return leftWrist;
                     case BodyNode.LeftHand: return leftHand;
                     case BodyNode.RightClavicle: return rightClavicle;
-                    case BodyNode.RightScapula: return rightScapula;
+                    //case BodyNode.RightScapula: return rightScapula;
                     case BodyNode.RightUpperArm: return rightUpperArm;
                     case BodyNode.RightForearm: return rightForearm;
                     case BodyNode.RightWrist: return rightWrist;
@@ -96,13 +96,13 @@ namespace MischievousByte.Masquerade
                     case BodyNode.Eyes: eyes = value; return;
                     case BodyNode.HeadTop: headTop = value; return;
                     case BodyNode.LeftClavicle: leftClavicle = value; return;
-                    case BodyNode.LeftScapula: leftScapula = value; return;
+                    //case BodyNode.LeftScapula: leftScapula = value; return;
                     case BodyNode.LeftUpperArm: leftUpperArm = value; return;
                     case BodyNode.LeftForearm: leftForearm = value; return;
                     case BodyNode.LeftWrist: leftWrist = value; return;
                     case BodyNode.LeftHand: leftHand = value; return;
                     case BodyNode.RightClavicle: rightClavicle = value; return;
-                    case BodyNode.RightScapula: rightScapula = value; return;
+                    //case BodyNode.RightScapula: rightScapula = value; return;
                     case BodyNode.RightUpperArm: rightUpperArm = value; return;
                     case BodyNode.RightForearm: rightForearm = value; return;
                     case BodyNode.RightWrist: rightWrist = value; return;
