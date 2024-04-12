@@ -1,7 +1,9 @@
+using PlasticGui.WorkspaceWindow.PendingChanges;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace MischievousByte.Masquerade.Utility
@@ -84,14 +86,19 @@ namespace MischievousByte.Masquerade.Utility
             tree[BodyNode.Eyes] = Matrix4x4.Translate(matrices[boneDataCache.Where(p => p.Value.bone == HumanBodyBones.Head).First().Key].MultiplyPoint(extra.eyes));
             tree[BodyNode.HeadTop] = Matrix4x4.Translate(matrices[boneDataCache.Where(p => p.Value.bone == HumanBodyBones.Head).First().Key].MultiplyPoint(extra.headTop));
             
-            /*
-            tree[BodyNode.LeftHand] = Matrix4x4.Translate(extra.leftPalm);
-            tree[BodyNode.RightHand] = Matrix4x4.Translate(extra.rightPalm);
-            tree[BodyNode.Eyes] = Matrix4x4.Translate(extra.eyes);
-            tree[BodyNode.HeadTop] = Matrix4x4.Translate(extra.headTop);*/
-
-
             tree.ChangeSpace(Space.Self, out tree);
+        }
+
+        public static void CreateTree(this Animator animator, Dictionary<BodyNode, Vector3> overrides, out BodyTree<Matrix4x4> tree)
+        {
+            tree = new();
+
+            var tPose = animator.GetReducedTPose();
+
+            Dictionary<Transform, Matrix4x4> matrices = new();
+            matrices[animator.avatarRoot] = Matrix4x4.identity;
+
+            
         }
 
         public static IEnumerable<BoneData> ExtractLocalTPoseMatrices(this Avatar avatar)
@@ -103,7 +110,7 @@ namespace MischievousByte.Masquerade.Utility
 
             foreach(HumanBone hb in avatar.humanDescription.human)
                 humanBoneCache.Add(hb.boneName, hb);
-
+            
             foreach (SkeletonBone sb in avatar.humanDescription.skeleton)
             {
                 if (!humanBoneCache.ContainsKey(sb.name))
@@ -116,6 +123,117 @@ namespace MischievousByte.Masquerade.Utility
                     matrix = Matrix4x4.TRS(sb.position, sb.rotation, sb.scale)
                 };
             }
+        }
+
+
+        //TODO: Handle missing optional bones (EG. UpperChest)
+        public static Dictionary<HumanBodyBones, Matrix4x4> GetReducedTPose(this Animator animator)
+        {
+            if (!animator.avatar.isHuman)
+                throw new ArgumentException();
+
+            Dictionary<HumanBodyBones, Matrix4x4> r = new();
+
+            Dictionary<string, Matrix4x4> matrices = new();
+
+            foreach (SkeletonBone sb in animator.avatar.humanDescription.skeleton)
+                matrices.Add(sb.name, Matrix4x4.TRS(sb.position, sb.rotation, sb.scale));
+
+            for(int i = 0; i < HumanTrait.BoneCount; i ++)
+            {
+                HumanBodyBones bone = (HumanBodyBones)i;
+
+                if (bone == HumanBodyBones.Hips)
+                    continue;
+
+                Transform self = animator.GetBoneTransform(bone);
+
+                if (self == null)
+                    continue;
+
+                Transform parent = animator.GetBoneTransform((HumanBodyBones)HumanTrait.GetParentBone((int)bone));
+
+                if (!self.IsChildOf(parent))
+                    throw new Exception("Child is not a child????");
+
+                Matrix4x4 e = matrices[self.name];
+
+                Transform c = self;
+                while((c = c.parent) != parent)
+                    e = matrices[c.name] * e;
+                
+                r.Add(bone, e);
+            }
+
+            Transform hips = animator.GetBoneTransform(HumanBodyBones.Hips);
+            r.Add(HumanBodyBones.Hips,animator.avatarRoot.worldToLocalMatrix * hips.localToWorldMatrix);
+            return r;
+        }
+
+
+        /// <summary>
+        /// Transforms in between mecanim bones that aren't present in the avatar will result in an exception
+        /// If a mecanim bone can't be found, it will be skipped. (both a entry and in the parent chain)
+        /// </summary>
+        /// <param name="animator"></param>
+        /// <returns></returns>
+        public static Dictionary<HumanBodyBones, Matrix4x4> GetReducedTPose2(this Animator animator)
+        {
+            Dictionary<HumanBodyBones, Matrix4x4> reducedTPose = new();
+
+            Dictionary<string, Matrix4x4> defaultMatrices = new();
+
+            foreach (SkeletonBone sb in animator.avatar.humanDescription.skeleton)
+                defaultMatrices.Add(sb.name, Matrix4x4.TRS(sb.position, sb.rotation, sb.scale));
+
+            for(int i = 0; i < HumanTrait.BoneCount; i ++)
+            {
+                HumanBodyBones bone = (HumanBodyBones)i;
+
+                if (bone == HumanBodyBones.Hips)
+                    continue;
+
+                Transform self = animator.GetBoneTransform(bone);
+
+                if (self == null)
+                    continue;
+
+                Transform parent = animator.GetBoneTransform(GetFirstParent(animator.avatar, bone));
+
+                if (!self.IsChildOf(parent))
+                    throw new ArgumentException();
+
+                Matrix4x4 e = defaultMatrices[self.name];
+                while ((self = self.parent) != parent)
+                    e = defaultMatrices[self.name] * e;
+
+                reducedTPose.Add(bone, e);
+
+            }
+            return reducedTPose;
+        }
+
+        public static HumanBodyBones GetFirstParent(this Avatar avatar, HumanBodyBones child)
+        {
+            if (child == HumanBodyBones.Hips)
+                return HumanBodyBones.LastBone;
+
+            IEnumerable<int> presentBones = 
+                avatar.humanDescription.human.Select(
+                    bone => 
+                    HumanTrait.BoneName
+                    .Select((name, index) => (name, index))
+                    .Where(p => p.name == bone.humanName).
+                    First().index);
+
+            int c = (int) child;
+
+            
+            while(!presentBones.Contains(c = HumanTrait.GetParentBone(c)))
+                if(c == -1)
+                    return HumanBodyBones.LastBone;
+
+            return (HumanBodyBones)c;
         }
     }
 }
