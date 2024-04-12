@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MischievousByte.Masquerade.Utility
 {
     [CreateAssetMenu()]
-    internal class MatrixTreeAsset : BodyTreeAsset<Matrix4x4>
+    public class MatrixTreeAsset : BodyTreeAsset<Matrix4x4>
     {
         
     }

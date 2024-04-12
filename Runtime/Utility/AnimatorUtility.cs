@@ -6,14 +6,21 @@ using UnityEngine;
 
 namespace MischievousByte.Masquerade.Utility
 {
+    public static class A
+    {
+        
+    }
+    
     public static class AnimatorUtility
     {
+
         [Serializable]
         public struct BoneData
         {
             public HumanBodyBones bone;
             public string name;
             public Matrix4x4 matrix;
+
         }
 
         public static void TPose(this Animator animator)
@@ -71,12 +78,18 @@ namespace MischievousByte.Masquerade.Utility
 
                 tree[node] = Matrix4x4.Translate(matrices[boneDataCache.Where(pair => pair.Value.bone == hbb).First().Value.name].GetPosition());
             }
-            
 
+            tree[BodyNode.LeftHand] = Matrix4x4.Translate(matrices[boneDataCache.Where(p => p.Value.bone == HumanBodyBones.LeftHand).First().Key].MultiplyPoint(extra.leftPalm));
+            tree[BodyNode.RightHand] = Matrix4x4.Translate(matrices[boneDataCache.Where(p => p.Value.bone == HumanBodyBones.RightHand).First().Key].MultiplyPoint(extra.rightPalm));
+            tree[BodyNode.Eyes] = Matrix4x4.Translate(matrices[boneDataCache.Where(p => p.Value.bone == HumanBodyBones.Head).First().Key].MultiplyPoint(extra.eyes));
+            tree[BodyNode.HeadTop] = Matrix4x4.Translate(matrices[boneDataCache.Where(p => p.Value.bone == HumanBodyBones.Head).First().Key].MultiplyPoint(extra.headTop));
+            
+            /*
             tree[BodyNode.LeftHand] = Matrix4x4.Translate(extra.leftPalm);
             tree[BodyNode.RightHand] = Matrix4x4.Translate(extra.rightPalm);
             tree[BodyNode.Eyes] = Matrix4x4.Translate(extra.eyes);
-            tree[BodyNode.HeadTop] = Matrix4x4.Translate(extra.headTop);
+            tree[BodyNode.HeadTop] = Matrix4x4.Translate(extra.headTop);*/
+
 
             tree.ChangeSpace(Space.Self, out tree);
         }
