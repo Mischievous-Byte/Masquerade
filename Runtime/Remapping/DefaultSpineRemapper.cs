@@ -1,10 +1,11 @@
+using MischievousByte.Masquerade.Anatomy;
 using MischievousByte.Masquerade.Utility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade.Remappers
+namespace MischievousByte.Masquerade.Remapping
 {
     public static class DefaultSpineRemapper
     {
@@ -41,8 +42,8 @@ namespace MischievousByte.Masquerade.Remappers
 
             float scale = destinationEyeHeight / sourceEyeHeight;
 
-            source.ChangeSpace(Space.World, out var worldSource);
-            destination.ChangeSpace(Space.World, out var worldDestination);
+            source.ToWorld(out var worldSource);
+            destination.ToWorld(out var worldDestination);
 
             Vector3 sourceEyeLocation = worldSource[BodyNode.Eyes].GetPosition();
             Vector3 targetEyeLocation = sourceEyeLocation * scale;

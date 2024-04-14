@@ -1,8 +1,9 @@
+using MischievousByte.Masquerade.Anatomy;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade
+namespace MischievousByte.Masquerade.Remapping
 {
     public delegate void RemapDelegate(
             in BodyTree<Matrix4x4> source,

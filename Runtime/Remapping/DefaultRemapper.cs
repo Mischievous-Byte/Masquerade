@@ -1,9 +1,10 @@
+using MischievousByte.Masquerade.Anatomy;
 using MischievousByte.Masquerade.Utility;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade.Remappers
+namespace MischievousByte.Masquerade.Remapping
 {
     public static class DefaultRemapper
     {

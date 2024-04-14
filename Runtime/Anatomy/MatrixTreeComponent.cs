@@ -1,9 +1,13 @@
+using MischievousByte.Masquerade.Utility;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade.Utility
+namespace MischievousByte.Masquerade.Anatomy
 {
+    /// <summary>
+    /// Simple implementation for BodyTreeComponent<Matrix4x4>
+    /// </summary>
     public class MatrixTreeComponent : BodyTreeComponent<Matrix4x4>
     {
 

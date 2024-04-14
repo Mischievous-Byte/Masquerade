@@ -1,11 +1,10 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade.Utility
+namespace MischievousByte.Masquerade.Anatomy
 {
-    public class BodyTreeAsset<T> : ScriptableObject
+    public abstract class BodyTreeComponent<T> : MonoBehaviour
     {
         public BodyTree<T> tree;
     }

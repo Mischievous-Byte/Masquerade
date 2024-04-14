@@ -1,3 +1,4 @@
+using MischievousByte.Masquerade.Anatomy;
 using PlasticGui;
 using PlasticGui.WorkspaceWindow.PendingChanges;
 using System;
@@ -35,7 +36,7 @@ namespace MischievousByte.Masquerade.Utility
                 if (pair.Key == HumanBodyBones.Hips)
                     parent = animator.avatarRoot;
                 else
-                    parent = animator.GetBoneTransform(GetFirstParent(animator.avatar, pair.Key));
+                    parent = animator.GetBoneTransform(pair.Key.GetClosestAncestor(animator));
 
                 Transform child = animator.GetBoneTransform(pair.Key);
 
@@ -86,7 +87,7 @@ namespace MischievousByte.Masquerade.Utility
             tree[BodyNode.Eyes] = Matrix4x4.Translate(matrices[boneDataCache.Where(p => p.Value.bone == HumanBodyBones.Head).First().Key].MultiplyPoint(extra.eyes));
             tree[BodyNode.HeadTop] = Matrix4x4.Translate(matrices[boneDataCache.Where(p => p.Value.bone == HumanBodyBones.Head).First().Key].MultiplyPoint(extra.headTop));
             
-            tree.ChangeSpace(Space.Self, out tree);
+            tree.ToLocal(out tree);
         }
 
         /// <summary>
@@ -110,7 +111,7 @@ namespace MischievousByte.Masquerade.Utility
                 if (!tPose.ContainsKey(bone))
                     continue;
 
-                HumanBodyBones parent = GetFirstParent(animator.avatar, bone);
+                HumanBodyBones parent = bone.GetClosestAncestor(animator);
 
                 Matrix4x4 r = worldTPose[parent] * tPose[bone];
                 worldTPose.Add(bone, r);
@@ -126,7 +127,7 @@ namespace MischievousByte.Masquerade.Utility
                 else
                     tree[pair.Key] = Matrix4x4.Translate(worldTPose[pair.Key.Previous().ToHuman()].MultiplyPoint(pair.Value));
 
-            tree.ChangeSpace(Space.Self, out tree);
+            tree.ToLocal(out tree);
         }
 
         public static IEnumerable<BoneData> ExtractLocalTPoseMatrices(this Avatar avatar)
@@ -182,7 +183,7 @@ namespace MischievousByte.Masquerade.Utility
                 if (self == null)
                     continue;
 
-                Transform parent = animator.GetBoneTransform(GetFirstParent(animator.avatar, bone));
+                Transform parent = animator.GetBoneTransform(bone.GetClosestAncestor(animator));
 
                 if (!self.IsChildOf(parent))
                     throw new ArgumentException();
@@ -204,25 +205,6 @@ namespace MischievousByte.Masquerade.Utility
 
             reducedTPose.Add(HumanBodyBones.Hips, h);
             return reducedTPose;
-        }
-
-        public static HumanBodyBones GetFirstParent(this Avatar avatar, HumanBodyBones child)
-        {
-            if (child == HumanBodyBones.Hips)
-                return HumanBodyBones.LastBone;
-
-            int c = (int)child;
-            
-            //Fastest it can be
-            do
-            {
-                c = HumanTrait.GetParentBone(c);
-
-                if (c == -1)
-                    return HumanBodyBones.LastBone;
-            } while (!avatar.humanDescription.human.Any(h => h.humanName == HumanTrait.BoneName[c]));
-
-            return (HumanBodyBones)c;
         }
     }
 }

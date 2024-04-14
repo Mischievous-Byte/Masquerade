@@ -1,3 +1,4 @@
+using MischievousByte.Masquerade.Anatomy;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,8 +7,22 @@ using System.Reflection;
 using System.Security.Cryptography;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade
+namespace MischievousByte.Masquerade.Remapping
 {
+    /// <summary>
+    /// Attribute used to signal <see cref="MischievousByte.Masquerade.Utility.RemapperRegistry"></see> during reflection phase
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    public class RemapperAttribute : Attribute
+    {
+        public readonly BodyNode Target;
+
+        public RemapperAttribute(BodyNode target)
+        {
+            Target = target;
+        }
+    }
+
     public static class RemapperRegistry
     {
         private static class MethodInfoLoader

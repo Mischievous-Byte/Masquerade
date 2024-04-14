@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade
+namespace MischievousByte.Masquerade.Anatomy
 {
     /// <summary>
     /// An enum containing all possible nodes for representing a hunanoid skeletal structure. Similar to <see cref="UnityEngine.HumanBodyBones">HumanBodyBones</see>

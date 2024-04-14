@@ -1,9 +1,10 @@
+using MischievousByte.Masquerade.Anatomy;
 using MischievousByte.Masquerade.Utility;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MischievousByte.Masquerade.Remappers
+namespace MischievousByte.Masquerade.Remapping
 {
     /// <summary>
     /// This remapper doesn't use shoulders, as that would be to implementation specific
@@ -98,7 +99,7 @@ namespace MischievousByte.Masquerade.Remappers
             BodyNode forearm = upperArm.Next();
             BodyNode wrist = forearm.Next();
 
-            tree.ChangeSpace(Space.World, out var worldTree);
+            tree.ToWorld(out var worldTree);
 
             float dynamicLength =
                 tree[wrist].GetPosition().magnitude
@@ -131,8 +132,8 @@ namespace MischievousByte.Masquerade.Remappers
             BodyNode wristNode = forearmNode.Next();
 
 
-            source.ChangeSpace(Space.World, out var worldSource);
-            destination.ChangeSpace(Space.World, out var worldDestination);
+            source.ToWorld(out var worldSource);
+            destination.ToWorld(out var worldDestination);
 
             Vector3 GetPlaneNormal()
             {
